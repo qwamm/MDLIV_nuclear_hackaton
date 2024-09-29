@@ -18,6 +18,6 @@ def redirect_from_github(code: str=""):
         if token=="bad_verification_code":
             return {"error": token}
         else:
-            return {"token": response.content.decode().split("&")[0].split("=")[-1]}
+            return {"token": token}
     else:
         return {'greetings': "hello from MDLIV"}
