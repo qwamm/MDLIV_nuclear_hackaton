@@ -5,20 +5,13 @@ from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncSession,
                                     async_sessionmaker, create_async_engine)
 from sqlalchemy.orm import DeclarativeBase
 
-from Static.params import (DB_HOST, DB_NAME, DB_PORT, DB_TYPE, DB_USER_LOGIN,
-                           DB_USER_PASSWORD)
-
-connect_string = ""
-
+from .. import (DB_HOST, DB_NAME, DB_PORT, DB_TYPE, DB_USER, DB_PASSWORD)
 
 class Base(DeclarativeBase):
     pass
 
 
-if DB_TYPE == "mysql":
-    connect_string = f"mysql+pymysql://{DB_USER_LOGIN}:{DB_USER_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-else:
-    connect_string = f"sqlite+aiosqlite:///./{DB_NAME}2.db"
+connect_string = f"{DB_TYPE}+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
 class DatabaseSessionManager:
