@@ -11,6 +11,9 @@ class UserService:
         self.session = session
         self.profile_repository = UserRepository(session)
 
+    async def get_by_id(self, id: int) -> User:
+        return await self.profile_repository.get_by_id(id)
+
     async def login(self, login: str, password: str) -> User:
         profile = await self.profile_repository.get_by_auth(login, password)
         if profile is None:

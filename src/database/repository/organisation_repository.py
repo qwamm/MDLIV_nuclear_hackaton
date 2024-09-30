@@ -25,13 +25,15 @@ class OrganisationRepository:
         self.session.add(organisation)
         await self.session.flush()
         new_organisation = await self.get_by_id(organisation.id)
-        creator.organisation_id = new_organisation.id
-        await self.session.flush()
         return new_organisation
 
     async def get_user_list(self, organisation: Organisation) -> list[User]:
         stmt = select(User).where(User.organisation_id == organisation.id)
         return list((await self.session.scalars(stmt)).all())
+
+    @staticmethod
+    async def get_owner(organisation: Organisation) -> User:
+        return organisation.creator
 
     async def add_user(self, organisation: Organisation, user: User) -> None:
         if user.organisation_id != organisation.id:

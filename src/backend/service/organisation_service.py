@@ -14,8 +14,7 @@ class OrganisationService:
     async def create(self, creator: User, name: str) -> Organisation:
         organisation = await self.organisation_repository.create(creator, name)
         if organisation is None:
-            raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR,
-                                "Unable to create organisation")
+            raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR, "Unable to create organisation")
         return organisation
 
     async def get_by_id(self, id: int) -> Organisation:
@@ -33,6 +32,14 @@ class OrganisationService:
     async def check_not_participant(self, organisation: Organisation, user: User) -> None:
         if user in await self.organisation_repository.get_user_list(organisation):
             raise HTTPException(HTTP_403_FORBIDDEN, "Already participant")
+
+    async def check_participant(self, organisation: Organisation, user: User) -> None:
+        if user not in await self.organisation_repository.get_user_list(organisation):
+            raise HTTPException(HTTP_403_FORBIDDEN, "Not participant")
+
+    async def check_owner(self, organisation: Organisation, user: User) -> None:
+        if self.organisation_repository.get_owner(organisation) != user:
+            raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
 
     async def add_user(self, organisation: Organisation, user: User) -> None:
         await self.organisation_repository.add_user(organisation, user)
