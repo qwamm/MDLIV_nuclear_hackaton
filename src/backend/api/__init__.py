@@ -1,2 +1,1 @@
-from .user import AuthController
-from .api import router
+from .auth import AuthController

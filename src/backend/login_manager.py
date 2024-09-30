@@ -8,7 +8,6 @@ from src import SECRET_KEY
 from src.exceptions import NotAuthenticatedException
 
 
-
 manager = LoginManager(SECRET_KEY, token_url='/api/auth/login',
                        use_cookie=True, not_authenticated_exception=NotAuthenticatedException)
 

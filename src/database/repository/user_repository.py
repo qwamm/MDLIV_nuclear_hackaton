@@ -6,21 +6,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .. import User
+from .. import Organisation
 
 
 class UserRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, id: int) -> Optional[User]:
+    async def get_by_id(self, id: int) -> User | None:
         stmt = select(User).where(User.id == id).limit(1)
         return await self.session.scalar(stmt)
 
-    async def get_by_username(self, username: str) -> Optional[User]:
+    async def get_by_username(self, username: str) -> User | None:
         stmt = select(User).where(User.username == username).limit(1)
         return await self.session.scalar(stmt)
 
-    async def get_by_auth(self, username: str, password: str) -> Optional[User]:
+    async def get_by_auth(self, username: str, password: str) -> User | None:
         profile = await self.get_by_username(username)
         if profile is None:
             return None
@@ -28,7 +29,7 @@ class UserRepository:
             return None
         return profile
 
-    async def registration(self, username: str, password: str) -> Optional[User]:
+    async def registration(self, username: str, password: str) -> User | None:
         profile = User(username=username)
         self.session.add(profile)
         await self.set_password(profile, password)
@@ -44,3 +45,10 @@ class UserRepository:
         if old_password is None:
             old_password = ""
         return check_password_hash(old_password, password)
+
+    async def get_organisation(self, profile: User) -> Organisation | None:
+        if profile.organisation_id is not None:
+            stmt = select(Organisation).where(Organisation.id == profile.organisation_id).limit(1)
+            return await self.session.scalar(stmt)
+        else:
+            return None

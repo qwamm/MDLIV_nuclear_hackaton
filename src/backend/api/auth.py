@@ -7,7 +7,7 @@ import json
 from datetime import timedelta
 
 from src.database import get_db_session, User
-from ...service import UserService
+from .. import UserService
 from src.backend.login_manager import manager
 
 

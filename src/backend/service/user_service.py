@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_login.exceptions import InvalidCredentialsException
 from starlette.status import HTTP_400_BAD_REQUEST
 
+
 class UserService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
-
         self.profile_repository = UserRepository(session)
 
     async def login(self, login: str, password: str) -> User:
