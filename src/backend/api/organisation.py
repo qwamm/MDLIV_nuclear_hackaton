@@ -1,4 +1,4 @@
-from fastapi import Depends, Response
+from fastapi import Depends, Response, HTTPException
 from fastapi_controllers import Controller, get, post
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,7 +8,7 @@ from src.database import User
 from src.database import OrganisationScheme, UserScheme, InviteScheme
 from .. import OrganisationService, UserService, InviteService
 from ..login_manager import manager
-
+from starlette.status import HTTP_403_FORBIDDEN
 
 class CreateOrganisationRequest(BaseModel):
     name: str
@@ -25,6 +25,8 @@ class InviteCreated(BaseModel):
 class KickRequest(BaseModel):
     user_id: int
 
+class SetRepoRequest(BaseModel):
+    repo_name: str
 
 class OrganisationController(Controller):
     prefix = "/organisation"
@@ -83,3 +85,13 @@ class OrganisationController(Controller):
         invite = await self.invite_service.create_invite(self.user, request.use_limit)
         await self.session.commit()
         return InviteCreated(key=invite.key)
+
+    @post("/repo")
+    async def set_repo_name(self, request: SetRepoRequest):
+        organisation = await self.organisation_service.get_by_id(self.user.organisation_id)
+        if self.user.id != organisation.creator_id:
+            raise HTTPException(HTTP_403_FORBIDDEN, 'only creator can change organisation repo')
+        else:
+            await self.organisation_service.set_repository_full_name(organisation, request.repo_name)
+            await self.session.commit()
+            return {"message": "OK"}

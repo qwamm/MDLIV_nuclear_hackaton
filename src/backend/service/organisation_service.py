@@ -13,6 +13,7 @@ class OrganisationService:
 
     async def create(self, creator: User, name: str) -> Organisation:
         organisation = await self.organisation_repository.create(creator, name)
+        await self.add_user(organisation, creator)
         if organisation is None:
             raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR, "Unable to create organisation")
         return organisation
@@ -46,5 +47,8 @@ class OrganisationService:
 
     async def remove_user(self, organisation: Organisation, user: User) -> None:
         await self.organisation_repository.remove_user(organisation, user)
+
+    async def set_repository_full_name(self, organisation: Organisation, repo: str) -> None:
+        await self.organisation_repository.set_repository_full_name(organisation, repo)
 
 

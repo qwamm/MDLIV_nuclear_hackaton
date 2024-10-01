@@ -32,6 +32,7 @@ class Organisation(Base):
 
     creator_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
     creator: Mapped["User"] = relationship(foreign_keys="Organisation.creator_id", lazy="selectin")
+    repository_full_name: Mapped[Optional[str]] = mapped_column(unique=True)
 
     def __repr__(self) -> str:
         return f"Organisation(id={self.id!r}, users={self.users!r})"
