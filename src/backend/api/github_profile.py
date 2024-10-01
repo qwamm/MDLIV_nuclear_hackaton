@@ -18,6 +18,7 @@ class ActivityResponse(BaseModel):
     pulls: int
     comments: int
     score: float
+    #useful comments percentage - comming soon
 
 class GithubController(Controller):
     prefix = "/github"
