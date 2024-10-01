@@ -38,7 +38,6 @@ class OrganisationRepository:
     async def add_user(self, organisation: Organisation, user: User) -> None:
         if user.organisation_id != organisation.id:
             user.organisation_id = organisation.id
-            organisation.users.append(user)
             await self.session.flush()
 
     async def remove_user(self, organisation: Organisation, user: User) -> None:

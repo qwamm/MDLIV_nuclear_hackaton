@@ -5,25 +5,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db_session
 from src.database import User
-from src.database import OrganisationScheme, UserScheme
-from .. import OrganisationService, UserService
-# from DataBase.schemes.invite import InviteInfo
-# from DataBase.schemes.role_scheme import RoleScheme
-# from DataBase.schemes.workspace_profile import WorkspaceProfileScheme
-# from DataBase.schemes.workspace_scheme import WorkspaceScheme
+from src.database import OrganisationScheme, UserScheme, InviteScheme
+from .. import OrganisationService, UserService, InviteService
 from ..login_manager import manager
 
 
 class CreateOrganisationRequest(BaseModel):
     name: str
 
-class ChangeWorkspaceUserRoleRequest(BaseModel):
-    workspace_profile_id: int
-    role_id: int
-
 
 class InviteCreateRequest(BaseModel):
-    use_limit: int = Field(ge=0, le=11)
+    use_limit: int = Field(ge=0)
 
 
 class InviteCreated(BaseModel):
@@ -46,23 +38,22 @@ class OrganisationController(Controller):
 
         self.organisation_service = OrganisationService(session)
         self.user_service = UserService(session)
+        self.invite_service = InviteService(session)
 
     @get("/", response_model=OrganisationScheme)
     async def get_organisation(self):
         return self.user.organisation
 
     @post("/", response_model=OrganisationScheme)
-    async def create_workspace(self, request: CreateOrganisationRequest):
+    async def create_organisation(self, request: CreateOrganisationRequest):
         organisation = await self.organisation_service.create(self.user, request.name)
         await self.organisation_service.add_user(organisation, self.user)
         await self.session.commit()
         return organisation
 
     @post("/{organisation_id}/kick")
-    async def kick(self,
-                   request: KickRequest,
-                   workspace_id: int):
-        organisation = await self.organisation_service.get_by_id(workspace_id)
+    async def organisation_kick(self, request: KickRequest, organisation_id: int):
+        organisation = await self.organisation_service.get_by_id(organisation_id)
         user = await self.user_service.get_by_id(request.user_id)
         await self.organisation_service.check_owner(organisation, user)
         await self.organisation_service.remove_user(organisation, user)
@@ -77,29 +68,18 @@ class OrganisationController(Controller):
         return {"message": "OK"}
 
     @get("/{organisation_id}/members", response_model=list[UserScheme])
-    async def get_workspace_members(self, organisation_id: int):
+    async def get_organisation_members(self, organisation_id: int):
         organisation = await self.organisation_service.get_by_id(organisation_id)
         await self.organisation_service.check_participant(organisation, self.user)
         return await self.organisation_service.get_users(organisation)
 
-    # TODO: here
-    # @get("/{workspace_id}/invite", response_model=list[InviteInfo])
-    # async def get_workspace_invites(self,
-    #                                 workspace_id: int):
-    #     workspace = await self.workspace_service.get_by_id(workspace_id)
-    #     workspace_profile = await self.workspace_profile_service.get_by_bind(self.profile, workspace)
-    #     await self.workspace_profile_service.check_permission(workspace_profile, Permissions.moderate_workspace)
-    #
-    #     return self.workspace_service.get_invites(workspace)
-    #
-    # @post("/{workspace_id}/invite", response_model=InviteCreated)
-    # async def create_workspace_invite(self,
-    #                                   workspace_id: int,
-    #                                   request: InviteCreateRequest):
-    #     workspace = await self.workspace_service.get_by_id(workspace_id)
-    #     workspace_profile = await self.workspace_profile_service.get_by_bind(self.profile, workspace)
-    #     await self.workspace_profile_service.check_permission(workspace_profile, Permissions.moderate_workspace)
-    #
-    #     invite = await self.workspace_service.create_invite(workspace_profile, request.use_limit)
-    #     await self.session.commit()
-    #     return InviteCreated(key=invite.key)
+    @get("/invite", response_model=list[InviteScheme])
+    async def get_organisation_invites(self, organisation_id: int):
+        organisation = await self.organisation_service.get_by_id(organisation_id)
+        return self.organisation_service.get_invites(organisation)
+
+    @post("/invite", response_model=InviteCreated)
+    async def create_organisation_invite(self, request: InviteCreateRequest):
+        invite = await self.invite_service.create_invite(self.user, request.use_limit)
+        await self.session.commit()
+        return InviteCreated(key=invite.key)
