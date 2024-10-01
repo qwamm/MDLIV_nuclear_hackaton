@@ -45,4 +45,5 @@ class GithubProfileRepository:
         else:
             ghp.auth_token=auth_token
             await self.session.flush()
+
         return await self.get_by_user_id(user_id)
