@@ -3,12 +3,13 @@ import datetime
 
 #to be replaced by data from db
 USER_LOGIN="kargamant"
-USER_TOKEN="ghu_8HBjRtbYWaiFBRP9Zbac70xiZvmPL43zejrx"
+USER_TOKEN="ghu_V4SPHsWyPv4iYc0fMyYWInnEWoFoai39fZMi"
 REPO_NAME="kargamant/tst_gh_app"
 
 #activation
 auth=pygit.Auth.Token(USER_TOKEN)
 user_github=pygit.Github(auth=auth)
+#if token is incorrect than throw github.GithubException.BadCredentialsException
 
 #data preps
 user_activity_data={

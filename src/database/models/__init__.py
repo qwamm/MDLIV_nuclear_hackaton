@@ -1,1 +1,2 @@
-from .models import User, Organisation, InviteKey
+from .models import User, Organisation, InviteKey, GithubProfile
+

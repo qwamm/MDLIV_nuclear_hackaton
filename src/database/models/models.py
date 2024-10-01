@@ -17,7 +17,7 @@ class User(Base):
     secret: Mapped[str | None]
 
     organisation_id: Mapped[Optional[int]] = mapped_column(ForeignKey("organisation.id"))
-    organisation: Mapped[Optional["Organisation"]] = relationship(foreign_keys='User.organisation_id')
+    organisation: Mapped[Optional["Organisation"]] = relationship(foreign_keys="User.organisation_id")
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, username={self.username!r})"
@@ -50,3 +50,15 @@ class InviteKey(Base):
 
     organisation_id: Mapped[int] = mapped_column(ForeignKey("organisation.id"))
     organisation: Mapped["Organisation"] = relationship()
+
+class GithubProfile(Base):
+    __tablename__ = "github_profile"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    github_username: Mapped[str] = mapped_column(unique=True)
+    auth_token: Mapped[Optional[str]]
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(foreign_keys="GithubProfile.user_id")
+
+    def __repr__(self) -> str:
+        return f"GithubProfile(id={self.id!r}, github_username={self.github_username!r}, auth_token={self.auth_token!r}, user_id={self.user_id!r})"

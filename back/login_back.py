@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 log_app=fs.FastAPI()
 
+#Btw useful code to get tokens for testing
 @log_app.get("/")
 def redirect_from_github(code: str=""):
     #example code=4d11b545c16e378ad2bb
@@ -30,6 +31,7 @@ def redirect_from_github(code: str=""):
                     "code": code,
                     "redirect_uri": "http://localhost:5173/"
             })
+            print(response.json()['access_token'])
             return response.json()
     else:
         return {'greetings': "hello from MDLIV"}

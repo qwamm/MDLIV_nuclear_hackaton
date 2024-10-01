@@ -20,7 +20,7 @@ class UserService:
             raise InvalidCredentialsException
         return profile
 
-    async def registration(self, login, password, repeat_password):
+    async def registration(self, login: str, password: str, repeat_password: str):
         if password != repeat_password:
             raise HTTPException(HTTP_400_BAD_REQUEST, "Passwords don't match")
         if await self.profile_repository.get_by_username(login) is not None:

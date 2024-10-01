@@ -20,3 +20,11 @@ DB_HOST = os.environ.get('PG_HOST', 'localhost')
 SITE_IP = os.environ.get("SITE_IP", "0.0.0.0")
 SITE_PORT = int(os.environ.get("SITE_PORT", "8080"))
 DEBUG = bool(os.environ.get("DEBUG", "False"))
+
+#for github token exchange
+DIRECT_URL="https://github.com/login/oauth/access_token"
+with open("client_id.txt") as file:
+    CLIENT_ID=file.readline()
+with open("client_secret.txt") as file:
+    CLIENT_SECRET=file.readline()
+REDIRECT_URI='http://127.0.0.1:8080/api/github_login/'
