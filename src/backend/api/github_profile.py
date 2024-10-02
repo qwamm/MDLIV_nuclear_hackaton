@@ -7,7 +7,7 @@ import json
 from datetime import timedelta
 
 from src.database import get_db_session, User
-from ..service import GithubProfileService, OrganisationService
+from ..service import GithubProfileService, OrganisationService, UserService
 from src.backend.login_manager import manager
 import requests
 from src import DIRECT_URL, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
@@ -29,6 +29,7 @@ class GithubController(Controller):
         self.user = user
         self.profile_service = GithubProfileService(session)
         self.organisation_service = OrganisationService(session)
+        self.user_service = UserService(session)
 
     @get("/login")
     async def login(self, code: str):
@@ -70,14 +71,15 @@ class GithubController(Controller):
             else:
                 total_commits = await self.profile_service.get_last_week_commits(self.user.id, str(organisation.repository_full_name))
                 total_pulls = await self.profile_service.get_last_week_pulls(self.user.id, str(organisation.repository_full_name))
-                total_comments = await self.profile_service.get_last_week_comments(self.user.id, str(organisation.repository_full_name))
-                total_useful_comments = await self.profile_service.get_last_week_useful_comments(self.user.id, str(organisation.repository_full_name))
+                total_useful_comments, total_comments = await self.profile_service.get_last_week_comments(self.user.id, str(organisation.repository_full_name), False)
+                #total_useful_comments = await self.profile_service.get_last_week_useful_comments(self.user.id, str(organisation.repository_full_name))
                 if any((total_comments, total_commits, total_pulls)) is None:
                     raise HTTPException(HTTP_400_BAD_REQUEST, 'github has not returned either commits, pulls or comments')
                 else:
                     good_comments_percentage = 0.0
-                    if total_useful_comments is not None:
+                    if total_useful_comments is not None and total_comments is not None and total_comments != 0:
                         good_comments_percentage = total_useful_comments/total_comments
                     print(good_comments_percentage*100, end='%\n')
                     score = 0.6 * total_commits + good_comments_percentage * total_comments + 0.1 * total_pulls
+                    await self.user_service.incr_coins(ghp.user_id, score.__ceil__())
                     return ActivityResponse(commits=total_commits, pulls=total_pulls, comments=total_comments, useful_comments_percentage=good_comments_percentage, score=score)

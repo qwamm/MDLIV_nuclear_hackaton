@@ -26,3 +26,8 @@ class UserService:
         if await self.profile_repository.get_by_username(login) is not None:
             raise HTTPException(HTTP_400_BAD_REQUEST, "User already exist")
         await self.profile_repository.registration(login, password)
+
+    async def incr_coins(self, user_id: int, coins: int) -> None:
+        user_db = await self.get_by_id(user_id)
+        await self.profile_repository.incr_coins(user_db, coins)
+        return None

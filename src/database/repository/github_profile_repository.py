@@ -35,7 +35,7 @@ class GithubProfileRepository:
         if ghp is None:
             git_client=git.Github(auth=git.Auth.Token(auth_token))
             try:
-                github_profile=GithubProfile(github_username=git_client.get_user().login, auth_token=auth_token, user_id=user_id)
+                github_profile=GithubProfile(github_username=git_client.get_user().login, auth_token=auth_token, user_id=user_id, last_commit_sha='', last_pull_id=-1, last_comment_id=-1)
             except git.GithubException:
                 git_client.close()
                 return None
@@ -47,3 +47,18 @@ class GithubProfileRepository:
             await self.session.flush()
 
         return await self.get_by_user_id(user_id)
+
+    async def drop_last_commit_sha(self, profile: GithubProfile, commit_sha: str) -> None:
+        profile.last_commit_sha = commit_sha
+        await self.session.commit()
+        return None
+
+    async def drop_last_pull_id(self, profile: GithubProfile, pull_id: int) -> None:
+        profile.last_pull_id = pull_id
+        await self.session.commit()
+        return None
+
+    async def drop_last_comment_id(self, profile: GithubProfile, comment_id: int) -> None:
+        profile.last_comment_id = comment_id
+        await self.session.commit()
+        return None

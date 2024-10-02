@@ -30,7 +30,7 @@ class UserRepository:
         return profile
 
     async def registration(self, username: str, password: str) -> User | None:
-        profile = User(username=username)
+        profile = User(username=username, coins=0)
         self.session.add(profile)
         await self.set_password(profile, password)
         return await self.get_by_id(profile.id)
@@ -52,3 +52,8 @@ class UserRepository:
             return await self.session.scalar(stmt)
         else:
             return None
+
+    async def incr_coins(self, profile: User, coins: int) -> None:
+        profile.coins += coins
+        await self.session.commit()
+        return None
