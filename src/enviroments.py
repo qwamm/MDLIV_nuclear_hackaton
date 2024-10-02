@@ -21,7 +21,7 @@ SITE_IP = os.environ.get("SITE_IP", "0.0.0.0")
 SITE_PORT = int(os.environ.get("SITE_PORT", "8080"))
 DEBUG = bool(os.environ.get("DEBUG", "False"))
 
-#for github token exchange
+# for github token exchange
 DIRECT_URL="https://github.com/login/oauth/access_token"
 with open("client_id.txt") as file:
     CLIENT_ID=file.readline()

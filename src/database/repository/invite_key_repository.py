@@ -20,6 +20,8 @@ class InviteRepository:
         return await self.session.scalar(stmt)
 
     async def create(self, user: User, use_limit=-1) -> Optional[InviteKey]:
+        if user.organisation_id is None:
+            return None
         key = secrets.token_urlsafe(8)
         key_data = InviteKey(creator_id=user.id, key=key, use_limit=use_limit, organisation_id=user.organisation_id)
         self.session.add(key_data)

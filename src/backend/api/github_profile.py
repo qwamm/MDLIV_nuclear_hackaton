@@ -10,7 +10,7 @@ from src.database import get_db_session, User
 from ..service import GithubProfileService, OrganisationService
 from src.backend.login_manager import manager
 import requests
-from ... import DIRECT_URL, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
+from src import DIRECT_URL, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
 class ActivityResponse(BaseModel):
@@ -50,6 +50,7 @@ class GithubController(Controller):
                 return {"message": "OK"}
         else:
             return {"message": "no code provided"}
+
 
     @get("/activity", response_model=ActivityResponse)
     async def get_activity(self):

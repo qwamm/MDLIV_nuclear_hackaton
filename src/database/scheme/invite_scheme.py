@@ -8,7 +8,6 @@ class InviteScheme(BaseModel):
     use_limit: int
     key: str
     creator: UserScheme
-    organisation: OrganisationScheme
 
     class Config:
         orm_mode = True

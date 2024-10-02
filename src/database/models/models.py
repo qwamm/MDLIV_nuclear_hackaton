@@ -46,10 +46,11 @@ class InviteKey(Base):
     use_limit: Mapped[int] = mapped_column(default=1)
 
     creator_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
-    creator: Mapped["User"] = relationship()
+    creator: Mapped["User"] = relationship(foreign_keys="InviteKey.creator_id", lazy="selectin")
 
     organisation_id: Mapped[int] = mapped_column(ForeignKey("organisation_table.id"))
-    organisation: Mapped["Organisation"] = relationship()
+    organisation: Mapped["Organisation"] = relationship(foreign_keys="InviteKey.organisation_id", lazy="selectin")
+
 
 class GithubProfile(Base):
     __tablename__ = "github_profile"

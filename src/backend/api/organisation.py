@@ -44,12 +44,13 @@ class OrganisationController(Controller):
 
     @get("/", response_model=OrganisationScheme)
     async def get_organisation(self):
-        return self.user.organisation
+        return await self.organisation_service.get_by_user(self.user)
 
     @post("/", response_model=OrganisationScheme)
     async def create_organisation(self, request: CreateOrganisationRequest):
-        organisation = await self.organisation_service.create(self.user, request.name)
-        await self.organisation_service.add_user(organisation, self.user)
+        user = await self.user_service.get_by_id(self.user.id)
+        organisation = await self.organisation_service.create(user, request.name)
+        await self.organisation_service.add_user(organisation, user)
         await self.session.commit()
         return organisation
 
@@ -57,15 +58,18 @@ class OrganisationController(Controller):
     async def organisation_kick(self, request: KickRequest, organisation_id: int):
         organisation = await self.organisation_service.get_by_id(organisation_id)
         user = await self.user_service.get_by_id(request.user_id)
-        await self.organisation_service.check_owner(organisation, user)
+        await self.organisation_service.check_owner(organisation, self.user)
+        await self.organisation_service.check_not_participant(organisation, user)
         await self.organisation_service.remove_user(organisation, user)
         await self.session.commit()
         return {"message": "OK"}
 
     @post("/{organisation_id}/leave")
     async def organisation_leave(self, organisation_id: int):
+        user = await self.user_service.get_by_id(self.user.id)
         organisation = await self.organisation_service.get_by_id(organisation_id)
-        await self.organisation_service.remove_user(organisation, self.user)
+        await self.organisation_service.check_participant(organisation, user)
+        await self.organisation_service.remove_user(organisation, user)
         await self.session.commit()
         return {"message": "OK"}
 
@@ -78,7 +82,8 @@ class OrganisationController(Controller):
     @get("/invite", response_model=list[InviteScheme])
     async def get_organisation_invites(self, organisation_id: int):
         organisation = await self.organisation_service.get_by_id(organisation_id)
-        return self.organisation_service.get_invites(organisation)
+        await self.organisation_service.check_owner(organisation, self.user)
+        return await self.organisation_service.get_invites(organisation)
 
     @post("/invite", response_model=InviteCreated)
     async def create_organisation_invite(self, request: InviteCreateRequest):

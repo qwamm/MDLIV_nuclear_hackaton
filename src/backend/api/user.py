@@ -28,9 +28,8 @@ class UserController(Controller):
         self.organisation_service = OrganisationService(session)
 
     @get("/", response_model=InfoResponse)
-    async def getInfo(self,
-                      user: User | None = Depends(manager.optional)):
+    async def getInfo(self, user: User | None = Depends(manager.optional)):
         response = {"auth": user is not None,
                     "user": user,
-                    "organisation": user.organisation if user else None}
+                    "organisation": await self.organisation_service.get_by_user(user) if user else None}
         return response
