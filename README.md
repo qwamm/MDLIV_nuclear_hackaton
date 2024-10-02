@@ -78,6 +78,10 @@ Core метод гитхаб интеграции - activity. Он собира�
 ![image](https://github.com/user-attachments/assets/3cd2fa03-d28b-41fb-9e73-b59b5cb25401)  
 > Для Бэкенда.
 > Потому что fast и потому что API
+## SQLalchemy  
+![image](https://github.com/user-attachments/assets/8ed7b10a-dfaf-4db5-87ed-b2a2049112e7)  
+> Для работы с базой данных  
+
 ## React  
 ![image](https://github.com/user-attachments/assets/2e16e0a0-96fe-4a88-95dd-794d6a65679d)  
 > Для Фронтэнда.
@@ -87,6 +91,10 @@ Core метод гитхаб интеграции - activity. Он собира�
 ## Aiogram  
 ![image](https://github.com/user-attachments/assets/d3a1c528-3449-426f-a3aa-9b28021cb17d)  
 > Для интеграции с телеграмом.
+## Llama cpp  
+![image](https://github.com/user-attachments/assets/a7de8ff9-b0b0-4d32-80e1-7400f2a4bba9)  
+> Для работы с LLM  
+
 ## Capybarahermes-2.5-mistral-7b.Q3_K_L  
 ![image](https://github.com/user-attachments/assets/5824f85f-4a4c-42f0-9523-56dd1531027c)
 > Как LLM для анализа комментариев на гите.  
