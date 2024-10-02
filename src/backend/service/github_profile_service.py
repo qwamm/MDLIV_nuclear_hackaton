@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_login.exceptions import InvalidCredentialsException
 from starlette.status import HTTP_404_NOT_FOUND
 from github import Auth, Github, GithubException
+from llm_integration.analyzer import LLM_Analyzer
 import datetime
 
 class GithubProfileService:
@@ -12,6 +13,7 @@ class GithubProfileService:
         self.session = session
         self.profile_repository = GithubProfileRepository(session)
         self.client = Github()
+        self.__good_comment_threshold = 5
 
     def initialise_github_client(self, auth_token: str) -> Github | None:
         auth = Auth.Token(auth_token)
@@ -98,6 +100,34 @@ class GithubProfileService:
                 total_pulls += ((datetime.datetime.now() - pull_date).days <= 7)
                 pulls_ids.add(pull.id)
         return total_pulls
+
+    async def get_last_week_useful_comments(self, user_id: int, repo: str) -> int | None:
+        if self.client is None:
+            return None
+
+        ghp = await  self.profile_repository.get_by_user_id(user_id)
+        if ghp is None:
+            return None
+
+        analyzer = LLM_Analyzer()
+        repo = self.client.get_repo(repo)
+        user_name = self.client.get_user(ghp.github_username).name
+        comments_ids = set()
+        total_useful_comments = 0
+
+        for br in repo.get_branches():
+            for commit in repo.get_commits(sha=br.commit.sha):
+                for comment in commit.get_comments():
+                    if comment.id in comments_ids:
+                        continue
+                    if comment.user.name == user_name:
+                        grade = analyzer.grade_comment(comment.body)
+                        if grade >= self.__good_comment_threshold:
+                            print(comment.body)
+                            comment_date = comment.created_at.replace(tzinfo=None)
+                            total_useful_comments += ((datetime.datetime.now() - comment_date).days <= 7)
+                            comments_ids.add(comment.id)
+        return total_useful_comments
 
     async def get_last_week_comments(self, user_id: int, repo: str) -> int | None:
         if self.client is None:

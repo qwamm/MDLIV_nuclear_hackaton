@@ -17,8 +17,8 @@ class ActivityResponse(BaseModel):
     commits: int
     pulls: int
     comments: int
+    useful_comments_percentage: float
     score: float
-    #useful comments percentage - comming soon
 
 class GithubController(Controller):
     prefix = "/github"
@@ -70,8 +70,11 @@ class GithubController(Controller):
                 total_commits = await self.profile_service.get_last_week_commits(self.user.id, str(organisation.repository_full_name))
                 total_pulls = await self.profile_service.get_last_week_pulls(self.user.id, str(organisation.repository_full_name))
                 total_comments = await self.profile_service.get_last_week_comments(self.user.id, str(organisation.repository_full_name))
+                total_useful_comments = await self.profile_service.get_last_week_useful_comments(self.user.id, str(organisation.repository_full_name))
                 if any((total_comments, total_commits, total_pulls)) is None:
                     raise HTTPException(HTTP_400_BAD_REQUEST, 'github has not returned either commits, pulls or comments')
                 else:
-                    score = 0.6 * total_commits + 0.3 * total_comments + 0.1 * total_pulls
-                    return ActivityResponse(commits=total_commits, pulls=total_pulls, comments=total_comments, score=score)
+                    good_comments_percentage = total_useful_comments/total_comments
+                    print(good_comments_percentage*100, end='%\n')
+                    score = 0.6 * total_commits + good_comments_percentage * total_comments + 0.1 * total_pulls
+                    return ActivityResponse(commits=total_commits, pulls=total_pulls, comments=total_comments, useful_comments_percentage=good_comments_percentage, score=score)
