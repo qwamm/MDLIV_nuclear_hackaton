@@ -28,3 +28,6 @@ with open("client_id.txt") as file:
 with open("client_secret.txt") as file:
     CLIENT_SECRET=file.readline()
 REDIRECT_URI='http://127.0.0.1:8080/api/github/login'
+
+
+BOT_TOKEN = os.environ.get("BOT_TOKEN", None)

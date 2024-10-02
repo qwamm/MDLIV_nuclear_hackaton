@@ -1,2 +1,2 @@
-from .models import User, Organisation, InviteKey, GithubProfile
+from .models import User, Organisation, InviteKey, GithubProfile, TelegramProfile
 
