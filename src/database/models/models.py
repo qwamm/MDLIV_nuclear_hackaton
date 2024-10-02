@@ -59,7 +59,7 @@ class GithubProfile(Base):
     github_username: Mapped[str] = mapped_column(unique=True)
     auth_token: Mapped[Optional[str]]
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
-    user: Mapped["User"] = relationship(foreign_keys="GithubProfile.user_id")
+    user: Mapped["User"] = relationship(foreign_keys="GithubProfile.user_id", lazy="selectin")
 
     def __repr__(self) -> str:
         return f"GithubProfile(id={self.id!r}, github_username={self.github_username!r}, auth_token={self.auth_token!r}, user_id={self.user_id!r})"
@@ -71,7 +71,9 @@ class TelegramProfile(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     telegram_username: Mapped[str] = mapped_column(unique=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
-    user: Mapped["User"] = relationship(foreign_keys="TelegramProfile.user_id")
+    user: Mapped["User"] = relationship(foreign_keys="TelegramProfile.user_id", lazy="selectin")
+
+    points: Mapped[int] = mapped_column(default=0)
 
     def __repr__(self) -> str:
         return f"TelegramProfile(id={self.id!r}, telegram_username={self.telegram_username!r}, user_id={self.user_id!r})"

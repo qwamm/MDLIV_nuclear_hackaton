@@ -11,7 +11,6 @@ class TelegramService:
         self.session = session
         self.telegram_repository = TelegramRepository(session)
 
-
     async def create(self, initiator: User, username: str) -> TelegramProfile:
         tg_profile = await self.telegram_repository.create(initiator, username)
         if tg_profile is None:
@@ -34,4 +33,8 @@ class TelegramService:
         tg_profile = await self.telegram_repository.get_by_user(user)
         if tg_profile is None:
             raise HTTPException(HTTP_404_NOT_FOUND, "Telegram profile not found")
+        # await self.session.refresh(tg_profile)
         return tg_profile
+
+    async def add_points(self, tg_profile: TelegramProfile):
+        await self.telegram_repository.add_points(tg_profile)

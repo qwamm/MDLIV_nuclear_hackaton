@@ -10,6 +10,7 @@ from .. import OrganisationService, UserService, InviteService
 from ..login_manager import manager
 from starlette.status import HTTP_403_FORBIDDEN
 
+
 class CreateOrganisationRequest(BaseModel):
     name: str
 
@@ -25,8 +26,10 @@ class InviteCreated(BaseModel):
 class KickRequest(BaseModel):
     user_id: int
 
+
 class SetRepoRequest(BaseModel):
     repo_name: str
+
 
 class OrganisationController(Controller):
     prefix = "/organisation"

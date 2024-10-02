@@ -15,7 +15,7 @@ class TelegramRepository:
         stmt = select(TelegramProfile).where(TelegramProfile.id == id).limit(1)
         return await self.session.scalar(stmt)
 
-    async def get_by_username(self, username: str) -> TelegramProfile | None:
+    async def get_by_username(self, username: str) -> Optional[TelegramProfile]:
         stmt = select(TelegramProfile).where(TelegramProfile.telegram_username == username).limit(1)
         return await self.session.scalar(stmt)
 
@@ -36,5 +36,9 @@ class TelegramRepository:
 
     async def set_username(self, tg_profile: TelegramProfile, username: str):
         tg_profile.telegram_username = username
+        await self.session.flush()
+
+    async def add_points(self, tg_profile: TelegramProfile, points: int = 1):
+        tg_profile.points += points
         await self.session.flush()
 

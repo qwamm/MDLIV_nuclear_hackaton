@@ -1,24 +1,28 @@
-import telebot
-from typing import Optional, List
-import logging
-import time
+from aiogram import Bot, Dispatcher
 from src import BOT_TOKEN
+from src.database import sessionmanager
+from src.database import TelegramRepository, TelegramProfile
+
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
 
 
-class T_bot(telebot.TeleBot):
-    def infinity_polling(self, timeout: Optional[int] = 20, skip_pending: Optional[bool] = False,
-                         long_polling_timeout: Optional[int] = 20,
-                         logger_level: Optional[int] = logging.ERROR, allowed_updates: Optional[List[str]] = None,
-                         *args, **kwargs):
-
-        while True:
-            try:
-                self.polling(non_stop=True, timeout=timeout, long_polling_timeout=long_polling_timeout,
-                             logger_level=logger_level, allowed_updates=allowed_updates, *args, **kwargs)
-            except Exception as e:
-                logging.exception("Infinity polling exception: %s", e)
-                time.sleep(3)
-                continue
+async def calculate_points(message):
+    async with sessionmanager.session() as session:
+        if message.chat.type == "private":
+            return
+        telegram_repository = TelegramRepository(session)
+        tg_profile = await telegram_repository.get_by_username(message.from_user.username)
+        if not tg_profile:
+            return
+        await telegram_repository.add_points(tg_profile, int(len(message.text) * 0.1))
+        await session.commit()
 
 
-bot = T_bot(BOT_TOKEN)
+@dp.message()
+async def send_default(message):
+    await calculate_points(message)
+
+
+async def main():
+    await dp.start_polling(bot)
