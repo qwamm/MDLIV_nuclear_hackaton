@@ -2,6 +2,7 @@ from fastapi import Depends, Response, HTTPException
 from fastapi_controllers import Controller, get
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.enviroments import USE_LLM
 
 import json
 from datetime import timedelta
@@ -71,7 +72,7 @@ class GithubController(Controller):
             else:
                 total_commits = await self.profile_service.get_last_week_commits(self.user.id, str(organisation.repository_full_name))
                 total_pulls = await self.profile_service.get_last_week_pulls(self.user.id, str(organisation.repository_full_name))
-                total_useful_comments, total_comments = await self.profile_service.get_last_week_comments(self.user.id, str(organisation.repository_full_name), False)
+                total_useful_comments, total_comments = await self.profile_service.get_last_week_comments(self.user.id, str(organisation.repository_full_name), USE_LLM)
                 #total_useful_comments = await self.profile_service.get_last_week_useful_comments(self.user.id, str(organisation.repository_full_name))
                 if any((total_comments, total_commits, total_pulls)) is None:
                     raise HTTPException(HTTP_400_BAD_REQUEST, 'github has not returned either commits, pulls or comments')

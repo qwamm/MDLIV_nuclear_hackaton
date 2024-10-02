@@ -38,7 +38,6 @@ class LLM_Analyzer:
 
         #most common answers are 'grade/10', 'grade / 10', 'grade out of 10'
         #but also it can be normal int
-        print(grade)
         if '/' in grade:
             grade = grade.split('/')
             if ' ' in grade[0]:

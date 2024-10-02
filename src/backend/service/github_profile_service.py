@@ -219,10 +219,11 @@ class GithubProfileService:
                     if comment.id in self.__comments_ids or comment.created_at.replace(tzinfo=None) <= last_comment_date:
                         continue
                     if comment.user.name == user_name:
+                        print(comment.body)
                         if use_llm:
                             grade = analyzer.grade_comment(comment.body)
                             if grade >= self.__good_comment_threshold:
-                                print(comment.body)
+                                print(grade)
                                 comment_date = comment.created_at.replace(tzinfo=None)
                                 useful_comments += ((datetime.datetime.now() - comment_date).days <= 7)
                         self.__comments_ids.add(comment.id)
