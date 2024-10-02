@@ -109,7 +109,11 @@ class GithubProfileService:
         if ghp is None:
             return None
 
-        analyzer = LLM_Analyzer()
+        try:
+            analyzer = LLM_Analyzer()
+        except ValueError:
+            return None
+
         repo = self.client.get_repo(repo)
         user_name = self.client.get_user(ghp.github_username).name
         comments_ids = set()

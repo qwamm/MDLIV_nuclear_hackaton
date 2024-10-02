@@ -75,7 +75,9 @@ class GithubController(Controller):
                 if any((total_comments, total_commits, total_pulls)) is None:
                     raise HTTPException(HTTP_400_BAD_REQUEST, 'github has not returned either commits, pulls or comments')
                 else:
-                    good_comments_percentage = total_useful_comments/total_comments
+                    good_comments_percentage = 0.0
+                    if total_useful_comments is not None:
+                        good_comments_percentage = total_useful_comments/total_comments
                     print(good_comments_percentage*100, end='%\n')
                     score = 0.6 * total_commits + good_comments_percentage * total_comments + 0.1 * total_pulls
                     return ActivityResponse(commits=total_commits, pulls=total_pulls, comments=total_comments, useful_comments_percentage=good_comments_percentage, score=score)
