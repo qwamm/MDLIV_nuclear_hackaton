@@ -4,6 +4,10 @@
 **CoffeeHub** - это сервис геймификации в IT-командах, который позволяет повысить мотивацию сотрудников за счёт начисления кружек кофе - внутриигровая валюта, которую можно обменять на мерч. 
 Кружки можно получать за активность на репозитории и в корпоративных чатах.
 
+# VIDEO OF HOW API WORKS
+
+[video](https://drive.google.com/file/d/1rjtTm9ntYTjIHeRnerv_yqsa8migEvET/view?usp=sharing)
+
 # Наша система  
 
  ![mdliv_nuclear drawio](https://github.com/user-attachments/assets/9f6638eb-6a62-4506-98c1-c5d26b6dcb1a)
