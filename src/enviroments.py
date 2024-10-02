@@ -31,4 +31,5 @@ REDIRECT_URI='http://127.0.0.1:8080/api/github/login'
 
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN", None)
+#in case you want to turn off llm
 USE_LLM = True
