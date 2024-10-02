@@ -29,7 +29,11 @@ class UserController(Controller):
 
     @get("/", response_model=InfoResponse)
     async def getInfo(self, user: User | None = Depends(manager.optional)):
+        try:
+            organisation = await self.organisation_service.get_by_user(user)
+        except Exception as e:
+            organisation = None
         response = {"auth": user is not None,
                     "user": user,
-                    "organisation": await self.organisation_service.get_by_user(user) if user else None}
+                    "organisation": organisation if user else None}
         return response
